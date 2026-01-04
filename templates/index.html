@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 text-center">
+        <h1 class="display-4 mb-4">AI Technical Interviewer</h1>
+        <p class="lead mb-4">Practice technical interviews with AI-powered evaluation</p>
+        
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">New User?</h5>
+                        <p class="card-text">Create an account to start practicing interviews</p>
+                        <a href="{{ url_for('register') }}" class="btn btn-primary">Register</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Existing User?</h5>
+                        <p class="card-text">Login to continue your interview practice</p>
+                        <a href="{{ url_for('login') }}" class="btn btn-success">Login</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-5">
+            <h3>How it works:</h3>
+            <div class="row mt-4">
+                <div class="col-md-3">
+                    <div class="text-primary mb-2">
+                        <i class="fas fa-user-plus fa-2x"></i>
+                    </div>
+                    <h6>1. Register</h6>
+                    <small>Create your account</small>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-primary mb-2">
+                        <i class="fas fa-file-upload fa-2x"></i>
+                    </div>
+                    <h6>2. Upload Resume</h6>
+                    <small>Upload your PDF resume</small>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-primary mb-2">
+                        <i class="fas fa-microphone fa-2x"></i>
+                    </div>
+                    <h6>3. Voice Interview</h6>
+                    <small>Answer questions using voice</small>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-primary mb-2">
+                        <i class="fas fa-chart-line fa-2x"></i>
+                    </div>
+                    <h6>4. Get Results</h6>
+                    <small>View your performance</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

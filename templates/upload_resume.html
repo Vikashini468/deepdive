@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Upload Resume & Start Interview</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="resume" class="form-label">Upload Resume (PDF only)</label>
+                        <input type="file" class="form-control" id="resume" name="resume" accept=".pdf" required>
+                        <div class="form-text">AI will automatically extract your skills and technical field from your resume</div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success w-100">Analyze Resume & Start Interview</button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="alert alert-info mt-4">
+            <h6>What happens next:</h6>
+            <ul class="mb-0">
+                <li>AI analyzes your resume to identify your technical field and skills</li>
+                <li>You'll introduce yourself (voice response)</li>
+                <li>5 technical questions tailored to your background</li>
+                <li>Each question worth 10 points (total 50 points)</li>
+                <li>Get instant feedback and performance analytics</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

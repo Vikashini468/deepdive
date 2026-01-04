@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="text-center mb-4">
+            <h2>Interview Results</h2>
+        </div>
+        
+        {% if interviews %}
+            {% set interview = interviews[0] %}
+            <div class="card glow mb-4">
+                <div class="card-body text-center">
+                    <div class="score-circle" style="--score: {{ (interview[11]/50)*100 }}">
+                        <div class="score-inner">
+                            <h1 class="mb-0">{{ interview[11] }}</h1>
+                            <small>out of 50</small>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        {% set percentage = (interview[11]/50)*100 %}
+                        <h4>
+                            {% if percentage >= 80 %}
+                                Excellent Performance!
+                            {% elif percentage >= 60 %}
+                                Good Performance!
+                            {% elif percentage >= 40 %}
+                                Average Performance
+                            {% else %}
+                                Needs Improvement
+                            {% endif %}
+                        </h4>
+                        <p class="text-muted">{{ "%.0f"|format(percentage) }}% Score</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card glow h-100">
+                        <div class="card-header">
+                            <h5 class="mb-0 text-success">✓ Strengths</h5>
+                        </div>
+                        <div class="card-body">
+                        {% if interview[12] %}
+                            {% set strengths = interview[12]|from_json %}
+                            {% if strengths %}
+                                <ul class="list-unstyled">
+                                    {% for strength in strengths %}
+                                        <li class="mb-2">• {{ strength }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <ul class="list-unstyled">
+                                    <li class="mb-2">• Good technical foundation</li>
+                                    <li class="mb-2">• Clear communication skills</li>
+                                    <li class="mb-2">• Problem-solving approach</li>
+                                </ul>
+                            {% endif %}
+                        {% else %}
+                            <ul class="list-unstyled">
+                                <li class="mb-2">• Good technical foundation</li>
+                                <li class="mb-2">• Clear communication skills</li>
+                                <li class="mb-2">• Problem-solving approach</li>
+                            </ul>
+                        {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card glow h-100">
+                        <div class="card-header">
+                            <h5 class="mb-0 text-warning">⚠ Areas to Improve</h5>
+                        </div>
+                        <div class="card-body">
+                        {% if interview[13] %}
+                            {% set weaknesses = interview[13]|from_json %}
+                            {% if weaknesses %}
+                                <ul class="list-unstyled">
+                                    {% for weakness in weaknesses %}
+                                        <li class="mb-2">• {{ weakness }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <ul class="list-unstyled">
+                                    <li class="mb-2">• Practice more complex scenarios</li>
+                                    <li class="mb-2">• Deepen technical knowledge</li>
+                                    <li class="mb-2">• Improve explanation clarity</li>
+                                </ul>
+                            {% endif %}
+                        {% else %}
+                            <ul class="list-unstyled">
+                                <li class="mb-2">• Practice more complex scenarios</li>
+                                <li class="mb-2">• Deepen technical knowledge</li>
+                                <li class="mb-2">• Improve explanation clarity</li>
+                            </ul>
+                        {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        {% else %}
+            <div class="card glow">
+                <div class="card-body text-center">
+                    <h5>No interviews completed yet</h5>
+                    <p class="text-muted">Start your first interview to see results here</p>
+                </div>
+            </div>
+        {% endif %}
+        
+        <div class="text-center mt-4">
+            <a href="{{ url_for('upload_resume') }}" class="btn btn-success btn-lg glow">
+                Start New Interview
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
