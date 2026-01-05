@@ -30,8 +30,8 @@ OLLAMA_URL = "http://localhost:11434/api/generate"
 MODEL = "llama3"
 TIMEOUT = 60
 
-# Load Whisper model
-whisper_model = whisper.load_model("base")
+# Remove Whisper - use browser speech recognition
+# whisper_model = whisper.load_model("base")
 
 def init_db():
     conn = sqlite3.connect('interviewer.db')
@@ -66,15 +66,23 @@ def init_db():
     conn.commit()
     conn.close()
 
+import os
+from groq import Groq
+
+# Groq configuration
+client = Groq(api_key=os.getenv('GROQ_API_KEY'))
+
 def _call_ollama(prompt: str) -> str:
-    payload = {"model": MODEL, "prompt": prompt, "stream": False}
     try:
-        res = requests.post(OLLAMA_URL, json=payload, timeout=TIMEOUT)
-        res.raise_for_status()
-        data = res.json()
-        return data.get("response", "").strip()
+        completion = client.chat.completions.create(
+            model="llama3-8b-8192",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.1,
+            max_tokens=1024
+        )
+        return completion.choices[0].message.content.strip()
     except Exception as e:
-        raise RuntimeError(f"Ollama call failed: {e}")
+        raise RuntimeError(f"Groq call failed: {e}")
 
 def evaluate_intro_with_llm(intro_text: str, resume_text: str, branch: str, skills: List[str]) -> str:
     prompt = f"""
@@ -102,27 +110,24 @@ Rules:
 
 def generate_branch_question(branch: str, skills: List[str], level: str) -> str:
     prompt = f"""
-You are a strict technical interviewer.
+You are a strict technical interviewer for {branch} field.
 
-Branch: {branch}
-Difficulty: {level}
-Skills: {', '.join(skills)}
+Candidate's Field: {branch}
+Candidate's Skills: {', '.join(skills)}
+Difficulty Level: {level}
 
-NON-NEGOTIABLE RULES:
-- Ask EXACTLY ONE CONCEPTUAL THEORY interview question
-- Question must test understanding of concepts, principles, or intuition
-- Do NOT ask for calculations, numericals, formulas, or derivations
-- Do NOT ask to design, draw, or implement anything
-- Do NOT ask for step-by-step procedures
-- Question MUST be answerable verbally without writing
-- Answer should not require equations or diagrams
-- Difficulty must be {level}
-- No hints
-- No explanation
-- No greeting
-- Output ONLY the question sentence
+IMPORTANT RULES:
+- Ask ONLY questions related to {branch} field
+- For ECE/Electronics: Ask about circuits, signals, communication, embedded systems
+- For Mechanical: Ask about thermodynamics, mechanics, manufacturing
+- For Civil: Ask about structures, materials, construction
+- For Chemical: Ask about processes, reactions, unit operations
+- DO NOT ask computer science questions unless the field is Computer Science
+- Question must be conceptual and answerable verbally
+- Difficulty: {level}
+- Output ONLY the question
 
-Ask now.
+Generate one {branch}-specific question now:
 """
     return _call_ollama(prompt)
 
@@ -219,15 +224,20 @@ Weaknesses:
 def extract_skills_and_branch(resume_text: str) -> tuple:
     """Extract skills and branch from resume using Ollama"""
     prompt = f"""
-Analyze this resume and extract:
-1. Technical field/branch (e.g., Software Engineering, Data Science, Mechanical Engineering, Civil Engineering, etc.)
-2. Key technical skills (programming languages, tools, technologies, frameworks)
+Analyze this resume and identify the candidate's engineering field and technical skills.
 
 Resume:
 {resume_text}
 
+IMPORTANT:
+- Identify the correct engineering branch (ECE/Electronics, Mechanical, Civil, Chemical, Computer Science, etc.)
+- Extract skills relevant to that specific field
+- For ECE: Include circuit design, signal processing, communication systems, embedded systems, VLSI, etc.
+- For Mechanical: Include CAD, manufacturing, thermodynamics, mechanics, etc.
+- For Civil: Include structural analysis, construction, materials, surveying, etc.
+
 Output format (STRICT):
-Branch: <field_name>
+Branch: <exact_field_name>
 Skills: <skill1>, <skill2>, <skill3>, ...
 """
     
@@ -346,20 +356,8 @@ def chat():
 
 @app.route('/process_audio', methods=['POST'])
 def process_audio():
-    if 'audio' not in request.files:
-        return jsonify({'error': 'No audio file'}), 400
-    
-    audio_file = request.files['audio']
-    audio_path = os.path.join(app.config['UPLOAD_FOLDER'], 'temp_audio.wav')
-    audio_file.save(audio_path)
-    
-    try:
-        result = whisper_model.transcribe(audio_path)
-        transcription = result['text']
-        os.remove(audio_path)
-        return jsonify({'transcription': transcription})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    # Use browser speech recognition instead
+    return jsonify({'error': 'Use browser speech recognition'}), 400
 
 @app.route('/evaluate_intro', methods=['POST'])
 def evaluate_intro():
